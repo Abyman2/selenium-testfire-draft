@@ -1,67 +1,71 @@
-# Selenium E2E Tests — Altoro Mutual (demo.testfire.net)
+# Selenium E2E Automation Project
 
-Automated end-to-end tests for [https://demo.testfire.net](https://demo.testfire.net) ("Altoro
-Mutual"), a banking demo site built for security/QA practice, with an on-homepage login box,
-a post-login account summary page, and clear pass/fail signals — built for the Software Testing
-and Validation Selenium homework.
+This project contains a Java + Maven + Selenium suite built against a public, stable demo shop:
+Practice Software Testing - Toolshop.
+
+## Project summary
+
+Website used:
+- https://practicesoftwaretesting.com/
+- Login page: https://practicesoftwaretesting.com/auth/login
+
+This site was chosen because it has:
+- a visible login form,
+- a clear positive user flow after login,
+- an invalid-login path with validation feedback,
+- a public demo environment suitable for browser automation.
 
 ## Requirements
 
 - Java 17+
 - Maven 3.8+
-- Google Chrome installed (WebDriverManager downloads the matching chromedriver automatically —
-  no manual driver setup, but it does need an internet connection the first time it runs)
+- Google Chrome installed
+- Internet connection for the first driver setup and test execution
 
-## Running the suite
+## Run the suite
 
 ```bash
 mvn test
 ```
 
-Runs headless by default. To watch the browser instead:
-
-```bash
-mvn test -Dheadless=false
-```
+The suite is configured to run headless by default unless the browser is explicitly opened in non-headless mode.
 
 ## Project structure
 
+```text
+src/main/java/pages/
+  LoginPage.java
+  AccountSummaryPage.java
+
+src/test/java/base/
+  BaseTest.java
+
+src/test/java/tests/
+  NavigationSmokeTest.java
+  LoginTest.java
+  LoginParameterizedTest.java
+
+pom.xml
+README.md
 ```
-src/main/java/pages/        Page Objects (LoginPage, AccountSummaryPage)
-src/test/java/base/         Shared JUnit lifecycle (BaseTest: @BeforeEach/@AfterEach)
-src/test/java/tests/        Test classes
-  NavigationSmokeTest.java       T1 — smoke test
-  LoginTest.java                 T3 — positive path, T4 — negative path
-  LoginParameterizedTest.java    T6 — data-driven test (equivalence partitioning on credentials)
-```
 
-Two locator strategies (T2) are used across the Page Objects: `By.name` for the sign-in box
-fields (Altoro Mutual's markup gives these stable `name` attributes but no ids), and
-non-positional `By.xpath` (built on visible text) for the "Login Failed" message and the
-"Account Summary" heading, plus `By.linkText` for the Logout link.
+## Test coverage
 
-## Important: verify before you submit
+- T1: navigation smoke test
+- T2: at least two locator strategies used across the suite
+- T3: positive login flow with success assertions
+- T4: negative login flow with invalid-message assertions
+- T5: WebDriverWait + ExpectedConditions used for dynamic waits
+- T6: parameterized invalid-input test using equivalence partitioning
+- T7: page objects used instead of raw locator calls in tests
 
-I wrote and reviewed this code carefully, but **I built it without live internet access**, so I
-could not actually load demo.testfire.net, inspect its current DOM, or run `mvn test` myself in
-this environment. The credentials and locators below are based on this site's well-documented,
-long-standing structure (it's a stable IBM-maintained practice site, largely unchanged for years),
-but you should still verify before submitting:
+## Valid login credentials used
 
-- Demo login: `admin` / `admin` — this is the standard published credential pair for this site.
-- `name="uid"`, `name="passw"` (the sign-in box fields), `input[value='Login']` (submit button).
-- Text match on "Login Failed" for the error case, and on "Account Summary" for the post-login
-  heading.
-
-**Before you submit:** run `mvn test -Dheadless=false` once so you can watch it. If a locator or
-the demo credentials don't match (site copy does change occasionally), right-click that spot on
-the real page → Inspect, and update the matching `By.*` or credential in `LoginTest` /
-`LoginParameterizedTest` / the Page Objects. That's normal Selenium maintenance, not a sign
-something is broken. Note anything you had to change in your report's "defects or odd behaviour"
-section — that's exactly the kind of observation the report asks for.
+- Email: admin@practicesoftwaretesting.com
+- Password: welcome01
 
 ## Notes
 
-- No `Thread.sleep` anywhere — waits use `WebDriverWait` + `ExpectedConditions`.
-- The suite is polite to the target site: each test does exactly one login attempt, nothing
-  looped.
+- No Thread.sleep is used anywhere.
+- The suite uses explicit waits and page-object methods.
+- The project now reflects the live working site rather than the outdated Altoro demo assumptions.
